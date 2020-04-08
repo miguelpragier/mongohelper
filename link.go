@@ -115,17 +115,32 @@ func (l *Link) connect() error {
 	}
 }
 
+// quickPing tries to reach the database in 10 seconds
+func (l Link) quickPing() error {
+	timeout := 10 * time.Second
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+
+	defer cancel()
+
+	return l.client.Ping(ctx, readpref.Primary())
+}
+
 // Collection returns a collection from the target database
 func (l Link) Collection(database, collection string) (*mongo.Collection, error) {
 	if l.client == nil {
 		return nil, fmt.Errorf("use of uninitialized connection")
 	}
 
+	if err := l.quickPing(); err != nil {
+		return nil, err
+	}
+
 	return l.client.Database(database).Collection(collection), nil
 }
 
 // Disconnect closes the client connection with database
-func (l*Link) Disconnect(){
+func (l *Link) Disconnect() {
 	if l.client != nil {
 		timeout := 10 * time.Second
 
@@ -133,8 +148,8 @@ func (l*Link) Disconnect(){
 
 		defer cancel()
 
-		if err:=l.client.Disconnect(ctx);err!=nil{
-			l.log("Disconnect",err.Error())
+		if err := l.client.Disconnect(ctx); err != nil {
+			l.log("Disconnect", err.Error())
 		}
 	}
 }
