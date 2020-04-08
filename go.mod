@@ -1,4 +1,4 @@
-module mongodbhelper
+module mongohelper
 
 go 1.13
 
