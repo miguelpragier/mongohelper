@@ -1,4 +1,4 @@
-module mongohelper
+module github.com/miguelpragier/mongohelper
 
 go 1.13
 
