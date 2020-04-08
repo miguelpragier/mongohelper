@@ -1,4 +1,4 @@
-package mongodbhelper
+package mongohelper
 
 import (
 	"fmt"
@@ -25,9 +25,9 @@ func New(connectionString string, opts *Options) (Link, error) {
 		connectionString: connectionString,
 	}
 
-	if err:=link.connect();err!=nil{
-		return Link{},err
+	if err := link.connect(); err != nil {
+		return Link{}, err
 	}
 
-	return link,nil
+	return link, nil
 }

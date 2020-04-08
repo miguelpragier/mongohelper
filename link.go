@@ -1,4 +1,4 @@
-package mongodbhelper
+package mongohelper
 
 import (
 	"context"

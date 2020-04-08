@@ -1,4 +1,4 @@
-package mongodbhelper
+package mongohelper
 
 import "time"
 
@@ -48,4 +48,3 @@ func OptionsNew(connectTimeoutInSeconds uint, insistOnFail bool, reconnectTimeIn
 		printLogMessages:                   logMessages,
 	}
 }
-
