@@ -1,6 +1,9 @@
 package mongohelper
 
-import "time"
+import (
+	"log"
+	"time"
+)
 
 // Link Options
 type Options struct {
@@ -8,6 +11,8 @@ type Options struct {
 	printLogMessages bool
 	// connectionTimeoutInSeconds is quite obvious
 	connectionTimeoutInSeconds uint
+	// executionTimeoutInSeconds equals to how much time the engine waits before return an error
+	executionTimeoutInSeconds uint
 	// InsistOnFail Is can't connect on first attempt, if should retry
 	reconnectionInsistOnFail bool
 	// SecondsBetweenAttempts Seconds btween each connection attempt
@@ -30,17 +35,34 @@ type Options struct {
 // reconnecAttemptsLimit maximum number of (re)connection attempts or 0 for infinite
 // reconnectAttemptsLimitMinutes maximum time ( in minutes ) trying to (re)connect or 0 for infinite
 // logMessages if true allow the engine to print out log messages to stdout
-func OptionsNew(connectTimeoutInSeconds uint, insistOnFail bool, reconnectTimeInSeconds, reconnecAttemptsLimit, reconnectAttemptsLimitMinutes uint, logMessages bool) *Options {
+func OptionsNew(connectTimeoutInSeconds, execTimeoutInSeconds uint, insistOnFail bool, reconnectTimeInSeconds, reconnecAttemptsLimit, reconnectAttemptsLimitMinutes uint, logMessages bool) *Options {
 	if reconnectTimeInSeconds < SecondsBetweenAttemptsMinDefault {
+		if logMessages {
+			log.Printf("value too low for reconnectTimeInSeconds: %d, when minimum allowed is %d; using default mongohelper.SecondsBetweenAttemptsMinDefault: %d instead\n", reconnectTimeInSeconds, SecondsBetweenAttemptsMinDefault, SecondsBetweenAttemptsMinDefault)
+		}
+
 		reconnectTimeInSeconds = SecondsBetweenAttemptsMinDefault
 	}
 
-	if connectTimeoutInSeconds == 0 {
+	if connectTimeoutInSeconds < ConnectionTimeoutInSecondsMinDefault {
+		if logMessages {
+			log.Printf("value too low for connectTimeoutInSeconds: %d, when minimum allowed is %d; using default mongohelper.ConnectionTimeoutInSecondsDefault: %d instead\n", connectTimeoutInSeconds, SecondsBetweenAttemptsMinDefault, ConnectionTimeoutInSecondsDefault)
+		}
+
 		connectTimeoutInSeconds = ConnectionTimeoutInSecondsDefault
+	}
+
+	if execTimeoutInSeconds < ExecutionTimeoutInSecondsMinDefault {
+		if logMessages {
+			log.Printf("value too low for execTimeoutInSeconds: %d, when minimum allowed is %d; using default mongohelper.ExecutionTimeoutInSecondsDefault: %d instead\n", execTimeoutInSeconds, SecondsBetweenAttemptsMinDefault, ExecutionTimeoutInSecondsDefault)
+		}
+
+		execTimeoutInSeconds = ExecutionTimeoutInSecondsDefault
 	}
 
 	return &Options{
 		connectionTimeoutInSeconds:         connectTimeoutInSeconds,
+		executionTimeoutInSeconds:          execTimeoutInSeconds,
 		reconnectionInsistOnFail:           insistOnFail,
 		reconnectionSecondsBetweenAttempts: reconnectTimeInSeconds,
 		reconnectionAttemptsLimit:          reconnecAttemptsLimit,

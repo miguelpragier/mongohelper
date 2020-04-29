@@ -115,11 +115,17 @@ func (l *Link) connect() error {
 	}
 }
 
+func (l Link) connTimeout() time.Duration {
+	return time.Duration(l.options.connectionTimeoutInSeconds) * time.Second
+}
+
+func (l Link) execTimeout() time.Duration {
+	return time.Duration(l.options.executionTimeoutInSeconds) * time.Second
+}
+
 // quickPing tries to reach the database in 10 seconds
 func (l Link) quickPing() error {
-	timeout := 10 * time.Second
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), l.connTimeout())
 
 	defer cancel()
 
@@ -137,19 +143,4 @@ func (l Link) Collection(database, collection string) (*mongo.Collection, error)
 	}
 
 	return l.client.Database(database).Collection(collection), nil
-}
-
-// Disconnect closes the client connection with database
-func (l *Link) Disconnect() {
-	if l.client != nil {
-		timeout := 10 * time.Second
-
-		ctx, cancel := context.WithTimeout(context.Background(), timeout)
-
-		defer cancel()
-
-		if err := l.client.Disconnect(ctx); err != nil {
-			l.log("Disconnect", err.Error())
-		}
-	}
 }
