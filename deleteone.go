@@ -35,9 +35,9 @@ func (l *Link) DeleteOne(database, collection string, filter interface{}) (int64
 			if rs, err = l.client.Database(database).Collection(collection).DeleteOne(ctx2, filter, options.Delete()); err != nil {
 				return 0, err
 			}
+		} else {
+			return 0, err
 		}
-
-		return 0, err
 	}
 
 	return rs.DeletedCount, nil

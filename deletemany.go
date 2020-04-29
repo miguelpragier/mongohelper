@@ -35,9 +35,9 @@ func (l *Link) DeleteMany(database, collection string, filter interface{}) (int6
 			if rs, err = l.client.Database(database).Collection(collection).DeleteMany(ctx2, filter, options.Delete()); err != nil {
 				return 0, err
 			}
+		} else {
+			return 0, err
 		}
-
-		return 0, err
 	}
 
 	return rs.DeletedCount, nil

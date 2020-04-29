@@ -30,12 +30,12 @@ type Options struct {
 // OptionsNew returns a pointer to mongohelper.Options instance.
 // Why a pointer? In this case is because you can send nil instead, and the engine provides default values.
 // connectTimeoutInSeconds is quite obvious
-// insistOnFail If can't connect on first attempt, if should retry
 // reconnectTimeInSeconds Seconds btween each connection attempt
 // reconnecAttemptsLimit maximum number of (re)connection attempts or 0 for infinite
 // reconnectAttemptsLimitMinutes maximum time ( in minutes ) trying to (re)connect or 0 for infinite
+// insistOnFail If can't connect on first attempt, if should retry
 // logMessages if true allow the engine to print out log messages to stdout
-func OptionsNew(connectTimeoutInSeconds, execTimeoutInSeconds uint, insistOnFail bool, reconnectTimeInSeconds, reconnecAttemptsLimit, reconnectAttemptsLimitMinutes uint, logMessages bool) *Options {
+func OptionsNew(connectTimeoutInSeconds, execTimeoutInSeconds uint, reconnectTimeInSeconds, reconnecAttemptsLimit, reconnectAttemptsLimitMinutes uint, insistOnFail, logMessages bool) *Options {
 	if reconnectTimeInSeconds < SecondsBetweenAttemptsMinDefault {
 		if logMessages {
 			log.Printf("value too low for reconnectTimeInSeconds: %d, when minimum allowed is %d; using default mongohelper.SecondsBetweenAttemptsMinDefault: %d instead\n", reconnectTimeInSeconds, SecondsBetweenAttemptsMinDefault, SecondsBetweenAttemptsMinDefault)

@@ -35,9 +35,9 @@ func (l *Link) InsertOne(database, collection string, document interface{}) (str
 			if rs, err = l.client.Database(database).Collection(collection).InsertOne(ctx2, document, options.InsertOne()); err != nil {
 				return ``, err
 			}
+		} else {
+			return ``, err
 		}
-
-		return ``, err
 	}
 
 	return fmt.Sprintf("%v", rs.InsertedID), nil

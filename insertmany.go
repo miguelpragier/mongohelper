@@ -35,9 +35,9 @@ func (l *Link) InsertMany(database, collection string, document []interface{}) (
 			if rs, err = l.client.Database(database).Collection(collection).InsertMany(ctx2, document, options.InsertMany()); err != nil {
 				return ``, err
 			}
+		} else {
+			return ``, err
 		}
-
-		return ``, err
 	}
 
 	return fmt.Sprintf("%v", rs.InsertedIDs), nil

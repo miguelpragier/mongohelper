@@ -39,9 +39,9 @@ func (l *Link) CountDocs(database, collection string, filter interface{}) (int64
 			if n, err = l.client.Database(database).Collection(collection).CountDocuments(ctx2, filter, options.Count()); err != nil {
 				return 0, err
 			}
+		} else {
+			return 0, err
 		}
-
-		return 0, err
 	}
 
 	return n, nil
