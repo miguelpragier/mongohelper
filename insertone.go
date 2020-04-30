@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -40,5 +41,11 @@ func (l *Link) InsertOne(database, collection string, document interface{}) (str
 		}
 	}
 
-	return fmt.Sprintf("%v", rs.InsertedID), nil
+	oidHex := ""
+
+	if oid, ok := rs.InsertedID.(primitive.ObjectID); ok {
+		oidHex = oid.Hex()
+	}
+
+	return oidHex, nil
 }

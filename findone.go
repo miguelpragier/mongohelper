@@ -46,5 +46,5 @@ func (l *Link) FindOne(database, collection string, filter interface{}, dest *in
 		err = l.client.Database(database).Collection(collection).FindOne(ctx2, filter, options.FindOne()).Decode(dest)
 	}
 
-	return nil
+	return err
 }

@@ -4,15 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // InsertMany wraps the mongo.Database.Collection.InsertMany() method
 // It returns an array with generated ObjectIDs and an error
-func (l *Link) InsertMany(database, collection string, document []interface{}) (string, error) {
+func (l *Link) InsertMany(database, collection string, document []interface{}) ([]string, error) {
 	if l.client == nil {
-		return ``, fmt.Errorf("mongohelper is not connected")
+		return []string{}, fmt.Errorf("mongohelper is not connected")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), l.execTimeout())
@@ -25,7 +26,7 @@ func (l *Link) InsertMany(database, collection string, document []interface{}) (
 		// If not connected, try once again
 		if errors.Is(err, mongo.ErrClientDisconnected) {
 			if err = l.connect(); err != nil {
-				return ``, err
+				return []string{}, err
 			}
 
 			ctx2, cancel2 := context.WithTimeout(context.Background(), l.execTimeout())
@@ -33,12 +34,20 @@ func (l *Link) InsertMany(database, collection string, document []interface{}) (
 			defer cancel2()
 
 			if rs, err = l.client.Database(database).Collection(collection).InsertMany(ctx2, document, options.InsertMany()); err != nil {
-				return ``, err
+				return []string{}, err
 			}
 		} else {
-			return ``, err
+			return []string{}, err
 		}
 	}
 
-	return fmt.Sprintf("%v", rs.InsertedIDs), nil
+	var oidHex []string
+
+	for _, o := range rs.InsertedIDs {
+		if oid, ok := o.(primitive.ObjectID); ok {
+			oidHex = append(oidHex, oid.Hex())
+		}
+	}
+
+	return oidHex, nil
 }
