@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Link Options
+// Options contains all necessary parameters to connect and mantain database client
 type Options struct {
 	// printLogMessages if true allow the engine to print log messages
 	printLogMessages bool

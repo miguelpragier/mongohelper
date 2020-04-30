@@ -91,16 +91,20 @@ func (l *Link) connect() error {
 	for {
 		var err error
 
-		if l.client, err = mongo.Connect(ctx, options.Client().ApplyURI(l.connectionString)); err == nil {
-			if err = l.client.Ping(context.Background(), readpref.Primary()); err == nil {
-				l.notifyConnection()
+		l.client, err = mongo.Connect(ctx, options.Client().ApplyURI(l.connectionString))
 
-				return nil
-			} else {
-				l.log("mongo.Ping", err.Error())
-			}
-		} else {
+		if err != nil {
 			l.log("mongo.Connect", err.Error())
+		}
+
+		err = l.client.Ping(context.Background(), readpref.Primary())
+
+		if err != nil {
+			l.log("mongo.Ping", err.Error())
+		} else {
+			l.notifyConnection()
+
+			return nil
 		}
 
 		if l.insistOnFail() {
