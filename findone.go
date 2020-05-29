@@ -14,7 +14,7 @@ import (
 // The filter parameter must be a document containing query operators and can be used to select the document to be
 // returned. It cannot be nil. If the filter does not match any documents, a SingleResult with an error set to
 // ErrNoDocuments will be returned. If the filter matches multiple documents, one will be selected from the matched set.
-func (l *Link) FindOne(database, collection string, filter interface{}, dest *interface{}) error {
+func (l *Link) FindOne(database, collection string, filter interface{}, dest interface{}) error {
 	if l.client == nil {
 		return fmt.Errorf("mongohelper is not connected")
 	}
