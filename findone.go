@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -12,7 +13,7 @@ import (
 // It returns a SingleResult for one document in the collection.
 //
 // The filter parameter must be a document containing query operators and can be used to select the document to be
-// returned. It cannot be nil. If the filter does not match any documents, a SingleResult with an error set to
+// returned. If the filter does not match any documents, a SingleResult with an error set to
 // ErrNoDocuments will be returned. If the filter matches multiple documents, one will be selected from the matched set.
 func (l *Link) FindOne(database, collection string, filter interface{}, dest interface{}) error {
 	if l.client == nil {
@@ -27,15 +28,19 @@ func (l *Link) FindOne(database, collection string, filter interface{}, dest int
 
 	defer cancel()
 
-	err := l.client.Database(database).Collection(collection).FindOne(ctx, filter, options.FindOne()).Decode(dest)
-
-	if err == nil {
-		return nil
+	if filter == nil {
+		filter = bson.M{}
 	}
 
-	// If not connected, try once again
-	if errors.Is(err, mongo.ErrClientDisconnected) {
-		if err = l.connect(); err != nil {
+	rs := l.client.Database(database).Collection(collection).FindOne(ctx, filter, options.FindOne())
+
+	if err := rs.Err(); err != nil {
+		// If not connected, try once again, reconnecting. otherwise, just return/leave
+		if !errors.Is(err, mongo.ErrClientDisconnected) {
+			return err
+		}
+
+		if err := l.connect(); err != nil {
 			return err
 		}
 
@@ -43,8 +48,16 @@ func (l *Link) FindOne(database, collection string, filter interface{}, dest int
 
 		defer cancel2()
 
-		err = l.client.Database(database).Collection(collection).FindOne(ctx2, filter, options.FindOne()).Decode(dest)
+		rs = l.client.Database(database).Collection(collection).FindOne(ctx2, filter, options.FindOne())
+
+		if err := rs.Err(); err != nil {
+			return err
+		}
 	}
 
-	return err
+	if err := rs.Decode(dest); err != nil {
+		return err
+	}
+
+	return nil
 }

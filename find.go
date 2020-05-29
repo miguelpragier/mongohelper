@@ -29,27 +29,25 @@ func (l *Link) Find(database, collection string, filter interface{}, dest interf
 	rs, err := l.client.Database(database).Collection(collection).Find(ctx, filter, options.Find())
 
 	if err != nil {
-		// If not connected, try once again
-		if errors.Is(err, mongo.ErrClientDisconnected) {
-			if err = l.connect(); err != nil {
-				return err
-			}
+		// If not connected, try once again, reconnecting. otherwise, just return/leave
+		if !errors.Is(err, mongo.ErrClientDisconnected) {
+			return err
+		}
 
-			ctx2, cancel2 := context.WithTimeout(context.Background(), l.execTimeout())
+		if err := l.connect(); err != nil {
+			return err
+		}
 
-			defer cancel2()
+		ctx2, cancel2 := context.WithTimeout(context.Background(), l.execTimeout())
 
-			if rs, err = l.client.Database(database).Collection(collection).Find(ctx2, filter, options.Find()); err != nil {
-				return err
-			}
-		} else {
+		defer cancel2()
+
+		rs, err = l.client.Database(database).Collection(collection).Find(ctx2, filter, options.Find())
+
+		if err != nil {
 			return err
 		}
 	}
 
-	if err0 := rs.All(context.TODO(), &dest); err0 != nil {
-		return err0
-	}
-
-	return nil
+	return rs.All(context.TODO(), &dest)
 }
