@@ -7,7 +7,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 )
+
+func cursorClose(rs *mongo.Cursor) {
+	if err := rs.Close(context.TODO()); err != nil {
+		log.Println(err)
+	}
+}
 
 // Find cs wraps the mongo.Database.Collection.Find() method
 // It returns a Cursor over the matching documents in the collection.
@@ -54,5 +61,5 @@ func (l *Link) Find(database, collection string, filter interface{}, dest interf
 		}
 	}
 
-	return rs.All(context.TODO(), &dest)
+	return rs.All(context.TODO(), dest)
 }
