@@ -91,7 +91,13 @@ func (l *Link) connect() error {
 	for {
 		var err error
 
-		l.client, err = mongo.Connect(ctx, options.Client().ApplyURI(l.connectionString))
+		opts := options.Client().ApplyURI(l.connectionString)
+		opts.SetConnectTimeout(l.connTimeout())
+		opts.SetMaxConnIdleTime(8 * time.Hour)
+		opts.SetSocketTimeout(l.execTimeout())
+		opts.SetMinPoolSize(10)
+
+		l.client, err = mongo.Connect(ctx)
 
 		if err != nil {
 			l.log("mongo.Connect", err.Error())
