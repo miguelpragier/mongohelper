@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -20,6 +21,10 @@ func (l *Link) Find(database, collection string, filter interface{}, dest interf
 
 	if dest == nil {
 		return fmt.Errorf(`given "dest" is null`)
+	}
+
+	if filter == nil {
+		filter = bson.M{}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), l.execTimeout())
