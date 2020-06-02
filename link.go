@@ -62,6 +62,10 @@ func (l *Link) notifyConnection() {
 	if l.options.reconnectionAttemptsLimitMinutes > 0 {
 		l.options.lastConnection = time.Now()
 	}
+
+	if l.options.printLogMessages {
+		log.Println("mongodb connected")
+	}
 }
 
 // log print log message if allowed by programmer in options
