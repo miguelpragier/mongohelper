@@ -3,7 +3,6 @@ package mongohelper
 import (
 	"context"
 	"errors"
-	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -12,8 +11,8 @@ import (
 // InsertOne wraps the mongo.Database.Collection.InsertOne() method
 // It returns the generated ObjectId and an error
 func (l *Link) InsertOne(database, collection string, document interface{}) (string, error) {
-	if l.client == nil {
-		return ``, fmt.Errorf("mongohelper is not connected")
+	if err := l.linkCheck("link.InsertOne"); err != nil {
+		return "", err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), l.execTimeout())

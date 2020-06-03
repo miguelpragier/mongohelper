@@ -16,8 +16,8 @@ import (
 // returned. If the filter does not match any documents, a SingleResult with an error set to
 // ErrNoDocuments will be returned. If the filter matches multiple documents, one will be selected from the matched set.
 func (l *Link) FindOne(database, collection string, filter interface{}, dest interface{}) error {
-	if l.client == nil {
-		return fmt.Errorf("mongohelper is not connected")
+	if err := l.linkCheck("link.FindOne"); err != nil {
+		return err
 	}
 
 	if dest == nil {

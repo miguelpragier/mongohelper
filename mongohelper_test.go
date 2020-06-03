@@ -26,7 +26,7 @@ type testDocStruct struct {
 }
 
 func TestNew(t *testing.T) {
-	if _m, err := New(testConnectionString, OptionsNew(10, 10, 10, 0, 0, false, true)); err != nil {
+	if _m, err := New(OptionsNew("mongohelpertest", testConnectionString, 10, 10, 10, 0, 0, false, true)); err != nil {
 		t.Fatal(err)
 	} else {
 		mdb = _m

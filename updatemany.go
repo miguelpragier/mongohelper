@@ -3,7 +3,6 @@ package mongohelper
 import (
 	"context"
 	"errors"
-	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -18,8 +17,8 @@ import (
 // (https://docs.mongodb.com/manual/reference/operator/update/) and can be used to specify the modifications to be made
 // to the selected documents. It cannot be nil or empty.
 func (l *Link) UpdateMany(database, collection string, filter, update interface{}) (int64, error) {
-	if l.client == nil {
-		return 0, fmt.Errorf("mongohelper is not connected")
+	if err := l.linkCheck("link.UpdateMany"); err != nil {
+		return 0, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), l.execTimeout())

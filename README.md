@@ -37,6 +37,7 @@ type testDocStruct struct {
 
 func main() {
 	const (
+        appName = "my app"
 		connTimeoutSeconds         = 10 // Time to wait for the first connection
 		execTimeoutSeconds         = 10 // Time to wait for execution
 		reconnTimeoutSeconds       = 10 // Time between reconnection attempts
@@ -53,7 +54,7 @@ func main() {
 
 	log.Println("Connecting db...")
 
-	if _m, err := mongohelper.New(testConnectionString, mongohelper.OptionsNew(connTimeoutSeconds, execTimeoutSeconds, reconnTimeoutSeconds, reconnAttemptsLimit, reconnAttemptsLimitMinutes, insistOnFailure, logDebugMessages)); err != nil {
+	if _m, err := mongohelper.New(mongohelper.OptionsNew(appName,testConnectionString,connTimeoutSeconds, execTimeoutSeconds, reconnTimeoutSeconds, reconnAttemptsLimit, reconnAttemptsLimitMinutes, insistOnFailure, logDebugMessages)); err != nil {
 		log.Fatal(err)
 	} else {
 		mdb = *_m

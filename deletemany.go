@@ -3,7 +3,6 @@ package mongohelper
 import (
 	"context"
 	"errors"
-	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -11,8 +10,8 @@ import (
 // DeleteMany wraps the mongo.Database.Collection.DeleteMany() method
 // It returns the number of affected records and an error
 func (l *Link) DeleteMany(database, collection string, filter interface{}) (int64, error) {
-	if l.client == nil {
-		return 0, fmt.Errorf("mongohelper is not connected")
+	if err := l.linkCheck("link.DeleteMany"); err != nil {
+		return 0, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), l.execTimeout())

@@ -3,7 +3,6 @@ package mongohelper
 import (
 	"context"
 	"errors"
-	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -15,8 +14,8 @@ import (
 // cannot be nil. An empty document (e.g. bson.D{}) should be used to count all documents in the collection. This will
 // result in a full collection scan.
 func (l *Link) CountDocs(database, collection string, filter interface{}) (int64, error) {
-	if l.client == nil {
-		return 0, fmt.Errorf("mongohelper is not connected")
+	if err := l.linkCheck("link.CountDocs"); err != nil {
+		return 0, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), l.execTimeout())

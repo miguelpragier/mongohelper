@@ -21,8 +21,8 @@ import (
 // The filter parameter must be a document containing query operators and can be used to select which documents are
 // included in the result. An empty document (e.g. bson.D{}) should be used to include all documents.
 func (l *Link) Find(database, collection string, filter interface{}, dest interface{}) error {
-	if l.client == nil {
-		return fmt.Errorf("mongohelper is not connected")
+	if err := l.linkCheck("link.Find"); err != nil {
+		return err
 	}
 
 	if dest == nil {

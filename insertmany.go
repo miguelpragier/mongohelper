@@ -3,7 +3,6 @@ package mongohelper
 import (
 	"context"
 	"errors"
-	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -12,8 +11,8 @@ import (
 // InsertMany wraps the mongo.Database.Collection.InsertMany() method
 // It returns an array with generated ObjectIDs and an error
 func (l *Link) InsertMany(database, collection string, document []interface{}) ([]string, error) {
-	if l.client == nil {
-		return []string{}, fmt.Errorf("mongohelper is not connected")
+	if err := l.linkCheck("link.InsertMany"); err != nil {
+		return []string{}, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), l.execTimeout())
