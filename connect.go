@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (l Link) defineLink(opts *options.ClientOptions) error {
+func (l *Link) defineLink(opts *options.ClientOptions) error {
 	ctx, cancel := context.WithTimeout(context.Background(), l.connTimeout())
 
 	defer cancel()
@@ -26,7 +26,7 @@ func (l Link) defineLink(opts *options.ClientOptions) error {
 	return nil
 }
 
-func (l Link) ping() error {
+func (l *Link) ping() error {
 	ctx, cancel := context.WithTimeout(context.Background(), l.connTimeout())
 
 	defer cancel()
